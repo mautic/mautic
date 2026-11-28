@@ -60,6 +60,8 @@ final class ConfigSubscriber implements EventSubscriberInterface
                 'do_not_track_404_anonymous'            => false,
                 'append_segment_id_tracking_url'        => false,
                 'aggregate_analytics'                   => true,
+                'track_asset_downloads'                 => true,
+                'track_link_clicks'                     => true,
             ],
         ]);
     }

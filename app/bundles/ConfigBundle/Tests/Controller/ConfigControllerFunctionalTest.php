@@ -330,6 +330,27 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertSame('0', $this->getConfigPageForm('leadconfig')['config[leadconfig][contact_export_notify_admins]']->getValue());
     }
 
+    public function testFormTrackSubmittersConfigCanBeEnabledAndDisabled(): void
+    {
+        // New installs start with No and upgrades with Yes, so set Yes first instead of relying on either
+        $this->submitConfigPage('formconfig', [
+            'config[formconfig][form_track_submitters]' => '1',
+        ]);
+        $this->assertTrue((bool) $this->getConfigParameters()['form_track_submitters']);
+        $this->assertSame('1', $this->getConfigPageForm('formconfig')['config[formconfig][form_track_submitters]']->getValue());
+        $this->assertStringContainsString('Track submitters on form submission', (string) $this->client->getResponse()->getContent());
+
+        $this->submitConfigPage('formconfig', [
+            'config[formconfig][form_track_submitters]' => '0',
+        ]);
+
+        $configParameters = $this->getConfigParameters();
+        $this->assertArrayHasKey('form_track_submitters', $configParameters);
+        $this->assertFalse((bool) $configParameters['form_track_submitters']);
+
+        $this->assertSame('0', $this->getConfigPageForm('formconfig')['config[formconfig][form_track_submitters]']->getValue());
+    }
+
     public function testAggregateAnalyticsDefaultsToEnabledAndCanBeDisabled(): void
     {
         $this->assertSame('1', $this->getConfigPageForm('trackingconfig')['config[trackingconfig][aggregate_analytics]']->getValue());
@@ -344,6 +365,38 @@ final class ConfigControllerFunctionalTest extends MauticMysqlTestCase
         $this->assertFalse((bool) $configParameters['aggregate_analytics']);
 
         $this->assertSame('0', $this->getConfigPageForm('trackingconfig')['config[trackingconfig][aggregate_analytics]']->getValue());
+    }
+
+    public function testTrackAssetDownloadsDefaultsToEnabledAndCanBeDisabled(): void
+    {
+        $this->assertSame('1', $this->getConfigPageForm('trackingconfig')['config[trackingconfig][track_asset_downloads]']->getValue());
+        $this->assertStringContainsString('Track asset downloads', (string) $this->client->getResponse()->getContent());
+
+        $this->submitConfigPage('trackingconfig', [
+            'config[trackingconfig][track_asset_downloads]' => '0',
+        ]);
+
+        $configParameters = $this->getConfigParameters();
+        $this->assertArrayHasKey('track_asset_downloads', $configParameters);
+        $this->assertFalse((bool) $configParameters['track_asset_downloads']);
+
+        $this->assertSame('0', $this->getConfigPageForm('trackingconfig')['config[trackingconfig][track_asset_downloads]']->getValue());
+    }
+
+    public function testTrackLinkClicksDefaultsToEnabledAndCanBeDisabled(): void
+    {
+        $this->assertSame('1', $this->getConfigPageForm('trackingconfig')['config[trackingconfig][track_link_clicks]']->getValue());
+        $this->assertStringContainsString('Track link clicks', (string) $this->client->getResponse()->getContent());
+
+        $this->submitConfigPage('trackingconfig', [
+            'config[trackingconfig][track_link_clicks]' => '0',
+        ]);
+
+        $configParameters = $this->getConfigParameters();
+        $this->assertArrayHasKey('track_link_clicks', $configParameters);
+        $this->assertFalse((bool) $configParameters['track_link_clicks']);
+
+        $this->assertSame('0', $this->getConfigPageForm('trackingconfig')['config[trackingconfig][track_link_clicks]']->getValue());
     }
 
     public function testRestrictedAssetFieldIsNotRenderedInConfigForm(): void
