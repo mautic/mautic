@@ -25,6 +25,7 @@ use Mautic\EmailBundle\Form\Type\EmailClickDecisionType;
 use Mautic\EmailBundle\Form\Type\EmailSendType;
 use Mautic\EmailBundle\Form\Type\EmailToUserType;
 use Mautic\EmailBundle\Helper\MailHelper;
+use Mautic\EmailBundle\Helper\MarketingEmailLock;
 use Mautic\EmailBundle\Helper\UrlMatcher;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToUser;
@@ -43,6 +44,7 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
         private TranslatorInterface $translator,
         private LeadModel $leadModel,
         private StatRepository $statRepository,
+        private MarketingEmailLock $marketingEmailLock,
     ) {
     }
 
@@ -332,32 +334,11 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
             $credentialArray[$logId] = $leadCredentials;
         }
 
-        if (MailHelper::EMAIL_TYPE_MARKETING == $type) {
-            $statRepository = $this->emailModel->getStatRepository();
-            // Determine if this lead has received the email before and if so, don't send it again
-            $stats = $statRepository->getSentCountForContacts($contactIds, $emailId);
-
-            // Merge stats from variant children
-            foreach ($email->getVariantChildren() as $child) {
-                $stats = array_merge(
-                    $stats,
-                    $statRepository->getSentCountForContacts($contactIds, $child->getId())
-                );
+        $sendEmail = function () use (&$credentialArray, $email, $options, $event, $pending): void {
+            if (0 === count($credentialArray)) {
+                return;
             }
 
-            foreach ($stats as $contactId => $sentCount) {
-                /** @var LeadEventLog $log */
-                $log = $event->findLogByContactId($contactId);
-                // Pass with a note to the UI because no use retrying
-                $event->passWithError(
-                    $log,
-                    $this->translator->trans('mautic.email.contact_already_received_marketing_email', ['%contact%' => $credentialArray[$log->getId()]['primaryIdentifier']])
-                );
-                unset($credentialArray[$log->getId()]);
-            }
-        }
-
-        if (count($credentialArray)) {
             $errors = $this->emailModel->sendEmail($email, $credentialArray, $options);
 
             // Fail those that failed to send
@@ -378,7 +359,73 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
             foreach (array_keys($credentialArray) as $logId) {
                 $event->pass($pending->get($logId));
             }
+        };
+
+        if (MailHelper::EMAIL_TYPE_MARKETING == $type) {
+            $marketingEmailIds = [$emailId];
+            foreach ($email->getVariantChildren() as $child) {
+                $marketingEmailIds[] = (int) $child->getId();
+            }
+
+            $locks = [];
+            foreach ($credentialArray as $logId => $credentials) {
+                $contact = $contacts->get($logId);
+                $contactId = $contact?->getId();
+                if (!$contact instanceof Lead || !$contactId) {
+                    continue;
+                }
+
+                $contactLocks = $this->marketingEmailLock->acquire($marketingEmailIds, (int) $contactId);
+                if (null !== $contactLocks) {
+                    $locks[$logId] = $contactLocks;
+                    continue;
+                }
+
+                $event->passWithError(
+                    $pending->get($logId),
+                    $this->translator->trans(
+                        'mautic.email.contact_already_received_marketing_email',
+                        ['%contact%' => $credentials['primaryIdentifier']]
+                    )
+                );
+                unset($credentialArray[$logId], $contactIds[$contactId]);
+            }
+
+            try {
+                $statRepository = $this->emailModel->getStatRepository();
+                // Determine if this lead has received the email before and if so, don't send it again
+                $stats = $statRepository->getSentCountForContacts($contactIds, $emailId);
+
+                // Merge stats from variant children
+                foreach ($email->getVariantChildren() as $child) {
+                    $stats = array_merge(
+                        $stats,
+                        $statRepository->getSentCountForContacts($contactIds, $child->getId())
+                    );
+                }
+
+                foreach ($stats as $contactId => $sentCount) {
+                    /** @var LeadEventLog $log */
+                    $log = $event->findLogByContactId($contactId);
+                    // Pass with a note to the UI because no use retrying
+                    $event->passWithError(
+                        $log,
+                        $this->translator->trans('mautic.email.contact_already_received_marketing_email', ['%contact%' => $credentialArray[$log->getId()]['primaryIdentifier']])
+                    );
+                    unset($credentialArray[$log->getId()]);
+                }
+
+                $sendEmail();
+            } finally {
+                foreach ($locks as $contactLocks) {
+                    $this->marketingEmailLock->release($contactLocks);
+                }
+            }
+
+            return;
         }
+
+        $sendEmail();
     }
 
     /**

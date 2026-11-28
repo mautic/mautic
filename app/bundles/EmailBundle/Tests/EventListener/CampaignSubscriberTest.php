@@ -13,6 +13,7 @@ use Mautic\CampaignBundle\Executioner\RealTimeExecutioner;
 use Mautic\EmailBundle\Entity\StatRepository;
 use Mautic\EmailBundle\EventListener\CampaignSubscriber;
 use Mautic\EmailBundle\Exception\EmailCouldNotBeSentException;
+use Mautic\EmailBundle\Helper\MarketingEmailLock;
 use Mautic\EmailBundle\Model\EmailModel;
 use Mautic\EmailBundle\Model\SendEmailToUser;
 use Mautic\LeadBundle\Entity\Lead;
@@ -39,7 +40,8 @@ final class CampaignSubscriberTest extends \PHPUnit\Framework\TestCase
             $this->sendEmailToUser,
             $this->createStub(TranslatorInterface::class),
             $this->createStub(LeadModel::class),
-            $this->createStub(StatRepository::class)
+            $this->createStub(StatRepository::class),
+            $this->createStub(MarketingEmailLock::class)
         );
     }
 
