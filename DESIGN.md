@@ -214,22 +214,6 @@ content-item-row:
 content-section: "Use on settings-style pages where a heading sits on the left and its content on the right."
 ```
 
-### data-table
-
-Use to compare or act on rows of structured data across columns. Pass `columns` (key, label, sortable, align) and `rows` (id, `cells` keyed by column).
-
-```yaml
-data-table:
-  default: "Use for read-only rows of structured data."
-  sortable: "Use when users reorder rows by a column."
-  searchable: "Use when users need to filter rows in the table."
-  selection: "Use for rows the user can select and act on in batch. Radio selection allows only one row."
-  expandable: "Use when a row has detail content that should stay out of the way until requested."
-  actions: "Use for per-row actions, in an overflow menu."
-  size: "Use xs to xl to match the table density to the content."
-  loading: "Use while data loads, instead of an empty table."
-```
-
 ### list-unordered
 
 ```yaml
