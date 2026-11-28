@@ -52,6 +52,30 @@ final class FormFieldHelperTest extends TestCase
         $this->assertEquals('St. Maarten', $lastCountryRegion);
     }
 
+    public function testPhilippineRegionsUseCurrentProvinceNames(): void
+    {
+        $regions = FormFieldHelper::getRegionChoices()['Philippines'];
+
+        foreach ([
+            'Bataan',
+            'Davao de Oro',
+            'Davao del Norte',
+            'Davao Occidental',
+            'Dinagat Islands',
+            'Kalinga',
+            'Maguindanao del Norte',
+            'Maguindanao del Sur',
+            'Negros Occidental',
+            'Zamboanga Sibugay',
+        ] as $province) {
+            $this->assertArrayHasKey($province, $regions);
+        }
+
+        foreach (['Batasn', 'Compostela Valley', 'Davao', 'Kalinga-Apayso', 'Negroe Occidental', 'Zamboanga Sibiguey'] as $oldName) {
+            $this->assertArrayNotHasKey($oldName, $regions);
+        }
+    }
+
     public function testCustomRegionList(): void
     {
         $_ENV['MAUTIC_UPLOAD_DIR'] = __DIR__.'/files';
