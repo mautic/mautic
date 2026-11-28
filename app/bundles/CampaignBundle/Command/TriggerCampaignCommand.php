@@ -304,7 +304,11 @@ final class TriggerCampaignCommand extends ModeratedCommand
      */
     private function checkCampaignEmailLocks(InputInterface $input, OutputInterface $output, array $emailLockKeys): bool
     {
-        if ([] === $emailLockKeys) {
+        // Thread workers partition contacts and use the contact+email guard in
+        // CampaignSubscriber. Holding one campaign-wide email lock here would
+        // make every worker except the first one exit without processing its
+        // disjoint contacts.
+        if ([] === $emailLockKeys || $input->getOption('thread-id')) {
             return true;
         }
 
