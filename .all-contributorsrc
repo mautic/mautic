@@ -1922,6 +1922,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "farisbasha",
+      "name": "Faris Basha TM",
+      "avatar_url": "https://avatars.githubusercontent.com/u/72191505?v=4",
+      "profile": "https://github.com/farisbasha",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
