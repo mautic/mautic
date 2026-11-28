@@ -52,6 +52,24 @@ final class FormFieldHelperTest extends TestCase
         $this->assertEquals('St. Maarten', $lastCountryRegion);
     }
 
+    public function testIndonesianRegionsIncludeAllProvinces(): void
+    {
+        $regions = FormFieldHelper::getRegionChoices()['Indonesia'];
+
+        foreach ([
+            'Kalimantan Tengah',
+            'Kalimantan Utara',
+            'Papua Barat',
+            'Papua Barat Daya',
+            'Papua Pegunungan',
+            'Papua Selatan',
+            'Papua Tengah',
+            'Sulawesi Barat',
+        ] as $province) {
+            $this->assertArrayHasKey($province, $regions);
+        }
+    }
+
     public function testCustomRegionList(): void
     {
         $_ENV['MAUTIC_UPLOAD_DIR'] = __DIR__.'/files';
