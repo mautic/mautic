@@ -5,23 +5,21 @@ declare(strict_types=1);
 namespace MauticPlugin\MauticFocusBundle\Tests\Functional\Controller;
 
 use Mautic\CoreBundle\Test\MauticMysqlTestCase;
+use Mautic\LeadBundle\Entity\Lead;
+use Mautic\LeadBundle\Tracker\ContactTracker;
 use Mautic\PageBundle\Entity\Redirect;
 use MauticPlugin\MauticFocusBundle\Entity\Focus;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Twig\Environment;
-use Twig\Extension\EscaperExtension;
-use Twig\Runtime\EscaperRuntime;
 
 final class PublicControllerTest extends MauticMysqlTestCase
 {
     #[PreserveGlobalState(false)]
     #[RunInSeparateProcess]
-    public function testGenerateActionWithContactTokenInLinkUrl(): void
+    public function testGenerateActionShowsContactTokensWithoutTheContact(): void
     {
-        $linkUrl = 'https://{contactfield=site_url}/tour';
+        $linkUrl = 'https://anonymous.example/{contactfield=firstname|visitor}/tour';
         $focus   = new Focus();
         $focus->setName('Test');
         $focus->setType('link');
@@ -47,25 +45,117 @@ final class PublicControllerTest extends MauticMysqlTestCase
             ],
         ]);
         $this->em->persist($focus);
+
+        $contact = new Lead();
+        $contact->setFirstname('DisplayFocusContact');
+        $this->em->persist($contact);
         $this->em->flush();
         $this->em->clear();
 
+        /** @var ContactTracker $contactTracker */
+        $contactTracker = self::getContainer()->get(ContactTracker::class);
+        $contactTracker->setSystemContact($contact);
+
         $this->client->request(Request::METHOD_GET, sprintf('/focus/%s.js', $focus->getId()));
-        $content = $this->client->getResponse()->getContent();
+        $displayContent = (string) $this->client->getResponse()->getContent();
+        $this->assertStringNotContainsString('viewpixel.gif', $displayContent);
+        $this->assertStringNotContainsString('DisplayFocusContact', $displayContent);
+        $this->assertStringContainsString('anonymous.example', $displayContent);
+        $this->assertStringContainsString('visitor', $displayContent);
+        $this->assertStringContainsString('mautic:tracking-enabled', $displayContent);
+        $this->assertStringNotContainsString('contactfield', $displayContent);
+        $this->assertCount(0, $this->em->getRepository(Redirect::class)->findAll());
+    }
 
-        $redirects = $this->em->getRepository(Redirect::class)->findAll();
-        $this->assertCount(1, $redirects);
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
+    public function testTrackingActionCreatesTrackedRedirect(): void
+    {
+        $focus = new Focus();
+        $focus->setName('Tracking redirect');
+        $focus->setType('link');
+        $focus->setStyle('modal');
+        $focus->setProperties([
+            'content' => [
+                'link_url' => 'https://example.com/tracking',
+            ],
+        ]);
+        $this->em->persist($focus);
+        $this->em->flush();
 
-        /** @var Redirect $redirect */
-        $redirect = reset($redirects);
-        $this->assertSame($linkUrl, $redirect->getUrl());
+        $this->client->request(Request::METHOD_GET, sprintf('/focus/%s/tracking.js', $focus->getId()));
 
-        $url  = $this->router->generate('mautic_url_redirect', ['redirectId' => $redirect->getRedirectId()], UrlGeneratorInterface::ABSOLUTE_URL);
-        $twig = $this->getContainer()->get(Environment::class);
-        if (!$twig->hasExtension(EscaperExtension::class)) {
-            $twig->addExtension(new EscaperExtension());
-        }
-        $url = $twig->getRuntime(EscaperRuntime::class)->escape($url, 'js');
-        $this->assertStringContainsString($url, (string) $content);
+        $this->assertStringContainsString('activateTracking', (string) $this->client->getResponse()->getContent());
+        $this->assertCount(1, $this->em->getRepository(Redirect::class)->findAll());
+    }
+
+    #[PreserveGlobalState(false)]
+    #[RunInSeparateProcess]
+    public function testResponsesAreNotSharedBetweenContacts(): void
+    {
+        $focus = new Focus();
+        $focus->setName('Contact isolation test');
+        $focus->setType('link');
+        $focus->setStyle('modal');
+        $focus->setProperties([
+            'content' => [
+                'headline'        => '{contactfield=firstname}',
+                'link_text'       => 'Link text',
+                'link_url'        => 'https://example.com/tour',
+                'font'            => 'Arial, Helvetica, sans-serif',
+                'link_new_window' => 1,
+            ],
+            'when'  => 'immediately',
+            'modal' => [
+                'placement' => 'top',
+            ],
+            'frequency' => 'everypage',
+            'colors'    => [
+                'primary'     => '#4e5d9d',
+                'text'        => '#000000',
+                'button'      => '#fdb933',
+                'button_text' => '#ffffff',
+            ],
+        ]);
+        $this->em->persist($focus);
+
+        $firstContact = new Lead();
+        $firstContact->setFirstname('AlphaFocusContact');
+        $this->em->persist($firstContact);
+
+        $secondContact = new Lead();
+        $secondContact->setFirstname('BetaFocusContact');
+        $this->em->persist($secondContact);
+
+        $this->em->flush();
+        $this->em->clear();
+
+        /** @var ContactTracker $contactTracker */
+        $contactTracker = self::getContainer()->get(ContactTracker::class);
+        $contactTracker->setSystemContact($firstContact);
+
+        $this->client->request(Request::METHOD_GET, sprintf('/focus/%s/tracking.js', $focus->getId()));
+        $firstTrackingResponse = $this->client->getResponse();
+        $firstTrackingContent  = (string) $firstTrackingResponse->getContent();
+        $this->assertTrue($firstTrackingResponse->headers->hasCacheControlDirective('private'));
+        $this->assertTrue($firstTrackingResponse->headers->hasCacheControlDirective('no-store'));
+
+        $contactTracker->setSystemContact($secondContact);
+        $this->client->request(Request::METHOD_GET, sprintf('/focus/%s/tracking.js', $focus->getId()));
+        $secondTrackingResponse = $this->client->getResponse();
+        $secondTrackingContent  = (string) $secondTrackingResponse->getContent();
+        $this->assertTrue($secondTrackingResponse->headers->hasCacheControlDirective('private'));
+        $this->assertTrue($secondTrackingResponse->headers->hasCacheControlDirective('no-store'));
+        $this->assertNotSame($firstTrackingContent, $secondTrackingContent);
+
+        // The script that shows the item never includes the contact
+        $contactTracker->setSystemContact($firstContact);
+        $this->client->request(Request::METHOD_GET, sprintf('/focus/%s.js', $focus->getId()));
+        $displayResponse = $this->client->getResponse();
+        $displayContent  = (string) $displayResponse->getContent();
+        $this->assertTrue($displayResponse->headers->hasCacheControlDirective('private'));
+        $this->assertTrue($displayResponse->headers->hasCacheControlDirective('no-store'));
+        $this->assertStringNotContainsString('AlphaFocusContact', $displayContent);
+        $this->assertStringNotContainsString('BetaFocusContact', $displayContent);
     }
 }

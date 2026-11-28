@@ -36,6 +36,16 @@ final class DbHelper extends Module
         }
     }
 
+    /**
+     * @param array<string, mixed> $criteria
+     */
+    public function deleteFromDatabase(string $table, array $criteria): void
+    {
+        /** @var Module\Db $db */
+        $db = $this->getModule('Db');
+        $db->_getDriver()->deleteQueryByCriteria($table, $criteria);
+    }
+
     private function loadEnv(): void
     {
         $dotenv = new Dotenv();
