@@ -5,6 +5,7 @@ namespace Mautic\LeadBundle\Entity;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\ORM\Query\ResultSetMapping;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\ProjectBundle\Entity\ProjectRepositoryTrait;
@@ -58,6 +59,18 @@ class LeadListRepository extends CommonRepository
                 ->leftJoin($this->getTableAlias().'.category', 'cat');
             $args['qb'] = $q;
         }
+
+        // Segment list sorts by category title. Uncategorised rows have a NULL title.
+        // MySQL sorts NULLs first for ASC and last for DESC; PostgreSQL does the
+        // opposite. Normalise this in SQL (portable across platforms) before the
+        // parent runs the query, because pagination applies LIMIT/OFFSET with the
+        // current ordering — reordering after fetching would only reorder the
+        // current page.
+        DatabasePlatform::normalizeNullOrder(
+            $args,
+            $this->getEntityManager()->getConnection(),
+            ['cat.title', 'category.title']
+        );
 
         return parent::getEntities($args);
     }
@@ -389,10 +402,12 @@ class LeadListRepository extends CommonRepository
 
     private function forceUseIndex(QueryBuilder $qb, string $indexName): QueryBuilder
     {
-        $fromPart             = $qb->getQueryPart('from');
-        $fromPart[0]['alias'] = sprintf('%s USE INDEX (%s)', $fromPart[0]['alias'], $indexName);
-        $qb->resetQueryPart('from');
-        $qb->from($fromPart[0]['table'], $fromPart[0]['alias']);
+        if (DatabasePlatform::allowsIndexHint($this->getEntityManager()->getConnection()->getDatabasePlatform())) {
+            $fromPart             = $qb->getQueryPart('from');
+            $fromPart[0]['alias'] = sprintf('%s USE INDEX (%s)', $fromPart[0]['alias'], $indexName);
+            $qb->resetQueryPart('from');
+            $qb->from($fromPart[0]['table'], $fromPart[0]['alias']);
+        }
 
         return $qb;
     }

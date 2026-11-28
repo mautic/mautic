@@ -27,13 +27,14 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         /** @var LeadModel $model */
         $model = self::getContainer()->get(LeadModel::class);
 
-        $this->lead->adjustPoints(100);
+        $lead = $this->createLead();
+        $lead->adjustPoints(100);
 
-        $model->saveEntity($this->lead);
+        $model->saveEntity($lead);
 
-        $this->assertEquals(200, $this->lead->getPoints());
+        $this->assertEquals(200, $lead->getPoints());
 
-        $changes = $this->lead->getChanges(true);
+        $changes = $lead->getChanges(true);
         $this->assertEquals(200, $changes['points'][1]);
     }
 
@@ -42,13 +43,14 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         /** @var LeadModel $model */
         $model = self::getContainer()->get(LeadModel::class);
 
-        $this->lead->adjustPoints(100, Lead::POINTS_SUBTRACT);
+        $lead = $this->createLead();
+        $lead->adjustPoints(100, Lead::POINTS_SUBTRACT);
 
-        $model->saveEntity($this->lead);
+        $model->saveEntity($lead);
 
-        $this->assertEquals(0, $this->lead->getPoints());
+        $this->assertEquals(0, $lead->getPoints());
 
-        $changes = $this->lead->getChanges(true);
+        $changes = $lead->getChanges(true);
         $this->assertEquals(0, $changes['points'][1]);
     }
 
@@ -57,13 +59,14 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         /** @var LeadModel $model */
         $model = self::getContainer()->get(LeadModel::class);
 
-        $this->lead->adjustPoints(2, Lead::POINTS_MULTIPLY);
+        $lead = $this->createLead();
+        $lead->adjustPoints(2, Lead::POINTS_MULTIPLY);
 
-        $model->saveEntity($this->lead);
+        $model->saveEntity($lead);
 
-        $this->assertEquals(200, $this->lead->getPoints());
+        $this->assertEquals(200, $lead->getPoints());
 
-        $changes = $this->lead->getChanges(true);
+        $changes = $lead->getChanges(true);
         $this->assertEquals(200, $changes['points'][1]);
     }
 
@@ -71,14 +74,14 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     {
         /** @var LeadModel $model */
         $model = self::getContainer()->get(LeadModel::class);
+        $lead  = $this->createLead();
+        $lead->adjustPoints(2, Lead::POINTS_DIVIDE);
 
-        $this->lead->adjustPoints(2, Lead::POINTS_DIVIDE);
+        $model->saveEntity($lead);
 
-        $model->saveEntity($this->lead);
+        $this->assertEquals(50, $lead->getPoints());
 
-        $this->assertEquals(50, $this->lead->getPoints());
-
-        $changes = $this->lead->getChanges(true);
+        $changes = $lead->getChanges(true);
         $this->assertEquals(50, $changes['points'][1]);
     }
 
@@ -87,16 +90,17 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
         /** @var LeadModel $model */
         $model = self::getContainer()->get(LeadModel::class);
 
-        $this->lead->adjustPoints(100, Lead::POINTS_SUBTRACT);
-        $this->lead->adjustPoints(120, Lead::POINTS_ADD);
-        $this->lead->adjustPoints(2, Lead::POINTS_MULTIPLY);
-        $this->lead->adjustPoints(4, Lead::POINTS_DIVIDE);
+        $lead  = $this->createLead();
+        // Single save with multiple operators (must succeed on PostgreSQL via nested expression)
+        $lead->adjustPoints(100, Lead::POINTS_SUBTRACT);
+        $lead->adjustPoints(120, Lead::POINTS_ADD);
+        $lead->adjustPoints(2, Lead::POINTS_MULTIPLY);
+        $lead->adjustPoints(4, Lead::POINTS_DIVIDE);
+        $model->saveEntity($lead);
 
-        $model->saveEntity($this->lead);
+        $this->assertEquals(60, $lead->getPoints());
 
-        $this->assertEquals(60, $this->lead->getPoints());
-
-        $changes = $this->lead->getChanges(true);
+        $changes = $lead->getChanges(true);
         $this->assertEquals(60, $changes['points'][1]);
     }
 
@@ -104,19 +108,20 @@ final class LeadRepositoryFunctionalTest extends MauticMysqlTestCase
     {
         /** @var LeadModel $model */
         $model = self::getContainer()->get(LeadModel::class);
-        $this->lead->adjustPoints(120, Lead::POINTS_ADD);
-        $model->saveEntity($this->lead);
+        $lead  = $this->createLead();
+        $lead->adjustPoints(120, Lead::POINTS_ADD);
+        $model->saveEntity($lead);
         // Changes should be stored with points
-        $changes = $this->lead->getChanges(true);
+        $changes = $lead->getChanges(true);
         $this->assertEquals(220, $changes['points'][1]);
         // Points should now not be in changes
-        $model->saveEntity($this->lead);
-        $changes = $this->lead->getChanges(true);
+        $model->saveEntity($lead);
+        $changes = $lead->getChanges(true);
         $this->assertArrayNotHasKey('points', $changes);
         // Points should remain the same
-        $model->saveEntity($this->lead);
-        self::getContainer()->get(LeadRepository::class)->saveEntity($this->lead);
-        $this->assertEquals(220, $this->lead->getPoints());
+        $model->saveEntity($lead);
+        $this->em->getRepository(Lead::class)->saveEntity($lead);
+        $this->assertEquals(220, $lead->getPoints());
     }
 
     /**

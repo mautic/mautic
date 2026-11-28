@@ -5,12 +5,16 @@ declare(strict_types=1);
 namespace Mautic\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20250923135527 extends PreUpAssertionMigration
 {
     protected const TABLE_NAME  = 'push_notifications';
-    private const COLUMN_NAME   = 'translation_parent_id';
+    protected const INDEX_NAME  = 'IDX_PUSH_NOTIFICATIONS_TRANSLATION_PARENT';
+
+    protected const COLUMN_NAME     = 'translation_parent_id';
+    protected const CONSTRAINT_NAME = 'FK_PUSH_NOTIFICATIONS_TRANSLATION_PARENT';
 
     protected function preUpAssertions(): void
     {
@@ -27,24 +31,32 @@ final class Version20250923135527 extends PreUpAssertionMigration
                 'notnull'  => false,
             ]);
 
-            $table->addIndex([self::COLUMN_NAME], 'IDX_PUSH_NOTIFICATIONS_TRANSLATION_PARENT');
+            $table->addIndex([self::COLUMN_NAME], self::INDEX_NAME);
 
             $table->addForeignKeyConstraint(
                 $table,
                 [self::COLUMN_NAME],
                 ['id'],
                 ['onDelete' => 'CASCADE'],
-                'FK_PUSH_NOTIFICATIONS_TRANSLATION_PARENT'
+                self::CONSTRAINT_NAME
             );
         }
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE '.$this->getPrefixedTableName().' DROP FOREIGN KEY FK_PUSH_NOTIFICATIONS_TRANSLATION_PARENT');
+        $table = $this->getPrefixedTableName();
+        if (DatabasePlatform::isPostgreSQL($this->connection->getDatabasePlatform())) {
+            $this->addSql("ALTER TABLE $table DROP CONSTRAINT IF EXISTS ".self::CONSTRAINT_NAME);
+        } else {
+            $this->addSql("ALTER TABLE $table DROP FOREIGN KEY ".self::CONSTRAINT_NAME);
+        }
 
-        $this->addSql('DROP INDEX IDX_PUSH_NOTIFICATIONS_TRANSLATION_PARENT ON '.$this->getPrefixedTableName());
+        $this->dropIndex(
+            $this->getPrefixedTableName(),
+            self::INDEX_NAME,
+        );
 
-        $this->addSql('ALTER TABLE '.$this->getPrefixedTableName().' DROP COLUMN translation_parent_id');
+        $this->addSql('ALTER TABLE '.$this->getPrefixedTableName().' DROP COLUMN '.self::COLUMN_NAME);
     }
 }

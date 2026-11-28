@@ -2,6 +2,7 @@
 
 namespace Mautic\EmailBundle\Stats\Helper;
 
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\EmailBundle\Stats\FetchOptions\EmailStatOptions;
 use Mautic\StatsBundle\Aggregate\Collection\StatCollection;
 
@@ -20,7 +21,17 @@ final class ClickedHelper extends AbstractHelper
     public function generateStats(\DateTime $fromDateTime, \DateTime $toDateTime, EmailStatOptions $options, StatCollection $statCollection): void
     {
         $query = $this->getQuery($fromDateTime, $toDateTime);
-        $q     = $query->prepareTimeDataQuery('page_hits', 'date_hit', [], 'DISTINCT t.email_id, t.redirect_id, t.lead_id');
+
+        // Platform-aware DISTINCT for COUNT
+        $platform     = $query->getConnection()->getDatabasePlatform();
+        $distinctExpr = DatabasePlatform::getDistinctMultiColumnExpression(
+            $platform,
+            't.email_id',
+            't.redirect_id',
+            't.lead_id'
+        );
+
+        $q     = $query->prepareTimeDataQuery('page_hits', 'date_hit', [], $distinctExpr);
 
         if ($segmentId = $options->getSegmentId()) {
             $q->innerJoin(

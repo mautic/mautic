@@ -15,6 +15,7 @@ use Mautic\CoreBundle\Helper\DateTimeHelper;
 use Mautic\LeadBundle\Entity\Lead;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+#[\PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses]
 final class ScheduledExecutionerExtendTriggerDateTest extends AbstractCampaignCommand
 {
     use CampaignAuditLogTrait;

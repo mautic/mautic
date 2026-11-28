@@ -104,7 +104,15 @@ final class FormSubmitWithoutTrackingFunctionalTest extends MauticMysqlTestCase
         $this->em->clear();
         $submission = $this->em->getRepository(Submission::class)->findOneBy(['form' => $formId]);
         $this->assertInstanceOf(Submission::class, $submission);
-        $resultsTable = $this->connection->fetchOne('SHOW TABLES LIKE ?', [MAUTIC_TABLE_PREFIX."form_results\\_{$formId}\\_%"]);
+        $schemaManager = $this->connection->createSchemaManager();
+        $prefix        = MAUTIC_TABLE_PREFIX.'form_results_'.$formId.'_';
+        $resultsTable  = null;
+        foreach ($schemaManager->listTableNames() as $table) {
+            if (str_starts_with($table, $prefix)) {
+                $resultsTable = $table;
+                break;
+            }
+        }
         $results      = $this->connection->fetchFirstColumn("SELECT comment FROM {$resultsTable} WHERE submission_id = ?", [$submission->getId()]);
         $this->assertSame(['Hello'], $results);
         $this->assertNotInstanceOf(Lead::class, $submission->getLead());

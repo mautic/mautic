@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Mautic\CoreBundle\Helper\Update\PreUpdateChecks;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Mautic\CoreBundle\Doctrine\Provider\VersionProvider;
 use Mautic\InstallBundle\Configurator\Step\DoctrineStep;
 
 final class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
@@ -16,11 +17,14 @@ final class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
 
     public function runCheck(): PreUpdateCheckResult
     {
-        $metadata   = $this->getUpdateCandidateMetadata();
-        $connection = $this->em->getConnection();
+        $metadata        = $this->getUpdateCandidateMetadata();
+        $connection      = $this->em->getConnection();
+        $versionProvider = new VersionProvider($connection);
 
-        // Version strings are in the format 10.3.30-MariaDB-1:10.3.30+maria~focal-log
-        $version  = $connection->executeQuery('SELECT VERSION()')->fetchOne();
+        // Version strings are in the format:
+        // 10.3.30-MariaDB-1:10.3.30+maria~focal-log
+        // PostgreSQL 16.11 (Ubuntu 16.11-0ubuntu0.24.04.1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0, 64-bit
+        $version = $versionProvider->getVersion();
 
         // Platform class names are in the format Doctrine\DBAL\Platforms\MariaDb1027Platform
         $platform = strtolower($connection->getDatabasePlatform()::class);
@@ -33,6 +37,8 @@ final class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
             $minSupported = $metadata->getMinSupportedMariaDbVersion();
         } elseif (str_contains($platform, 'mysql')) {
             $minSupported = $metadata->getMinSupportedMySqlVersion();
+        } elseif (str_contains($platform, 'postgresql')) {
+            $minSupported = $metadata->getMinSupportedPostgreSqlVersion();
         } else {
             $supportedDrivers = implode(', ', DoctrineStep::getDriverKeys());
 
@@ -44,12 +50,13 @@ final class CheckDatabaseDriverAndVersion extends AbstractPreUpdateCheck
             )]);
         }
 
-        if (version_compare($version, $minSupported, '<')) {
+        if (version_compare($versionProvider::getNumericVersion($version), $minSupported, '<')) {
             return new PreUpdateCheckResult(false, $this, [new PreUpdateCheckError('mautic.core.update.check.database_version',
                 [
-                    '%currentversion%'    => $version,
-                    '%mysqlminversion%'   => $metadata->getMinSupportedMySqlVersion(),
-                    '%mariadbminversion%' => $metadata->getMinSupportedMariaDbVersion(),
+                    '%currentversion%'          => $version,
+                    '%mysqlminversion%'         => $metadata->getMinSupportedMySqlVersion(),
+                    '%mariadbminversion%'       => $metadata->getMinSupportedMariaDbVersion(),
+                    '%postgresqlminversion%'    => $metadata->getMinSupportedPostgreSqlVersion(),
                 ]),
             ]);
         }

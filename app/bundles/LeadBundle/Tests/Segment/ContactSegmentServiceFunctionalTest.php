@@ -44,6 +44,10 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
+        // Clear identity map so Role/User proxies from a previous test cannot
+        // point at IDs that no longer exist after TRUNCATE / sequence restart.
+        $this->em->clear();
+
         $this->clearLoggedInUser();
         if (!$this->useCleanupRollback) {
             $this->resetSegmentFixtureAutoincrement();
@@ -81,8 +85,11 @@ final class ContactSegmentServiceFunctionalTest extends MauticMysqlTestCase
     {
         $this->resetAutoincrement(
             [
+                'roles',
+                'users',
                 'leads',
                 'lead_lists',
+                'companies',
             ]
         );
     }

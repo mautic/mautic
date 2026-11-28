@@ -78,8 +78,18 @@ final class SegmentDependencyTreeFactory
             }
         }
 
+        // findBy does not guarantee any specific order
+        $segments = $this->leadListRepository->findBy([
+            'id' => $childSegmentIds,
+        ]);
+
+        usort(
+            $segments,
+            static fn (LeadList $a, LeadList $b): int => $a->getId() <=> $b->getId()
+        );
+
         return array_values(array_filter(
-            $this->leadListRepository->findBy(['id' => $childSegmentIds]),
+            $segments,
             fn (LeadList $childSegment): bool => $this->corePermissions->hasEntityAccess(
                 LeadPermissions::LISTS_VIEW_OWN,
                 LeadPermissions::LISTS_VIEW_OTHER,

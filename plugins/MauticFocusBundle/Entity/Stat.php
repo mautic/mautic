@@ -53,7 +53,7 @@ class Stat
 
         $builder->setTable('focus_stats')
             ->setCustomRepositoryClass(StatRepository::class)
-            ->addIndex(['type'], 'focus_type')
+            ->addIndex(['type'], 'stat_focus_type')
             ->addIndex(['type', 'type_id'], 'focus_type_id')
             ->addIndex(['date_added'], 'focus_date_added');
 

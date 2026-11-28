@@ -19,9 +19,12 @@ final class WebhookModelTest extends MauticMysqlTestCase
     {
         parent::setUp();
 
-        // Cleanup from previous tests
+        // 1. Cleanup from previous tests
         $this->connection->executeStatement('DELETE FROM '.MAUTIC_TABLE_PREFIX.'webhook_queue');
-        $this->connection->executeStatement('ALTER TABLE '.MAUTIC_TABLE_PREFIX.'webhook_queue AUTO_INCREMENT = 1');
+
+        // 2. Use the helper to reset IDs for both MySQL and PostgreSQL
+        // Note: Do not include the prefix here; the helper adds it automatically
+        $this->resetAutoincrement(['webhook_queue']);
     }
 
     public function testEventsOrderByDirAsc(): void

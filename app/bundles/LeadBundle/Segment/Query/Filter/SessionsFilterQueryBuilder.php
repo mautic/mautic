@@ -2,6 +2,7 @@
 
 namespace Mautic\LeadBundle\Segment\Query\Filter;
 
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\LeadBundle\Segment\ContactSegmentFilter;
 use Mautic\LeadBundle\Segment\Query\QueryBuilder;
 
@@ -25,6 +26,11 @@ final class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
 
         $queryBuilder->setParameter($expressionValueAlias, (int) $filter->getParameterValue());
 
+        $intervalExpr = DatabasePlatform::getIntervalExpression(
+            $this->getConnection()->getDatabasePlatform(),
+            30
+        );
+
         $exclusionQueryBuilder = $queryBuilder->createQueryBuilder();
         $exclusionQueryBuilder
             ->select($exclusionAlias.'.id')
@@ -34,7 +40,7 @@ final class SessionsFilterQueryBuilder extends BaseFilterQueryBuilder
                     $queryBuilder->expr()->eq($leadsTableAlias.'.id', $exclusionAlias.'.lead_id'),
                     $queryBuilder->expr()->gt(
                         $exclusionAlias.'.date_hit',
-                        $pageHitsAlias.'.date_hit - INTERVAL 30 MINUTE'
+                        $pageHitsAlias.'.date_hit - '.$intervalExpr
                     ),
                     $queryBuilder->expr()->lt($exclusionAlias.'.date_hit', $pageHitsAlias.'.date_hit')
                 )

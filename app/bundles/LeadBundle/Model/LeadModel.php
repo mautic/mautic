@@ -13,6 +13,7 @@ use Mautic\CategoryBundle\Entity\Category;
 use Mautic\CategoryBundle\Model\CategoryModel;
 use Mautic\ChannelBundle\Helper\ChannelListHelper;
 use Mautic\CoreBundle\Cache\ResultCacheOptions;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\IpAddress;
 use Mautic\CoreBundle\Form\RequestTrait;
 use Mautic\CoreBundle\Helper\Chart\ChartQuery;
@@ -2072,16 +2073,23 @@ class LeadModel extends FormModel
      */
     public function getCustomLeadFieldLength(array $aliases): array
     {
+        $connection = $this->em->getConnection();
+        $platform   = $connection->getDatabasePlatform();
+
         $columns = [];
         foreach ($aliases as $alias) {
-            $columns[] = sprintf('max(CHAR_LENGTH(`%s`)) `%s`', $alias, $alias);
+            $quotedAlias      = $platform->quoteIdentifier($alias);
+            $lengthExpression = DatabasePlatform::getCharLengthSql($platform, $quotedAlias);
+            $columns[]        = sprintf('MAX(%s) %s', $lengthExpression, $quotedAlias);
         }
 
-        $query = $this->em->getConnection()->createQueryBuilder();
+        $query = $connection->createQueryBuilder();
         $query->select(implode(', ', $columns))
             ->from(MAUTIC_TABLE_PREFIX.'leads');
 
-        return $query->executeQuery()->fetchAssociative();
+        $result = $query->executeQuery()->fetchAssociative();
+
+        return $result ?: [];
     }
 
     /**

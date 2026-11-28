@@ -6,6 +6,7 @@ namespace Mautic\LeadBundle\EventListener;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Doctrine\ORM\Query\Expr;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\LeadBundle\Event\SegmentOperatorQueryBuilderEvent;
 use Mautic\LeadBundle\LeadEvents;
 use Mautic\LeadBundle\Segment\OperatorOptions;
@@ -73,7 +74,7 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             'notLike',
             'notBetween', // Used only for date with week combination (NOT EQUAL [this week, next week, last week])
             'notIn',
-            OperatorOptions::EXCLUDING_ALL, // For non-multiselect fields (e.g. select/country), treat as notIn
+            OperatorOptions::EXCLUDING_ALL // For non-multiselect fields (e.g. select/country), treat as notIn
         )) {
             return;
         }
@@ -98,15 +99,41 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
         // Treat EXCLUDING_ALL with a single value as notIn
         $operator = $event->operatorIsOneOf(OperatorOptions::EXCLUDING_ALL) ? 'notIn' : $event->getFilter()->getOperator();
 
-        $event->addExpression(
-            $event->getQueryBuilder()->expr()->or(
-                $event->getQueryBuilder()->expr()->isNull($leadsTableAlias.'.'.$event->getFilter()->getField()),
-                $event->getQueryBuilder()->expr()->{$operator}(
-                    $leadsTableAlias.'.'.$event->getFilter()->getField(),
-                    $event->getParameterHolder()
+        $platform = $event->getQueryBuilder()->getConnection()->getDatabasePlatform(); /** @phpstan-ignore-line getConnection is deprecated */
+        $column   = $leadsTableAlias.'.'.$event->getFilter()->getField();
+
+        if (in_array($operator, ['like', 'notLike'], true)) {
+            // getCaseInsensitiveComparison emits ILIKE on PostgreSQL and plain
+            // LIKE on MySQL (already case-insensitive). FLAG_ENSURE_CAST keeps
+            // the text cast; FLAG_NEGATIVE covers notLike.
+            $flags = DatabasePlatform::FLAG_ENSURE_CAST;
+            if ('notLike' === $operator) {
+                $flags |= DatabasePlatform::FLAG_NEGATIVE;
+            }
+            $comparison = DatabasePlatform::getCaseInsensitiveComparison(
+                $platform,
+                $column,
+                (string) $event->getParameterHolder(),
+                'LIKE',
+                $flags
+            );
+            $event->addExpression(
+                $event->getQueryBuilder()->expr()->or(
+                    $event->getQueryBuilder()->expr()->isNull($column),
+                    $comparison
                 )
-            )
-        );
+            );
+        } else {
+            $event->addExpression(
+                $event->getQueryBuilder()->expr()->or(
+                    $event->getQueryBuilder()->expr()->isNull($column),
+                    $event->getQueryBuilder()->expr()->{$operator}(
+                        $column,
+                        $event->getParameterHolder()
+                    )
+                )
+            );
+        }
 
         $event->stopPropagation();
     }
@@ -146,8 +173,15 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
             $filterGlue = 'or';
         }
 
+        $connection = $event->getQueryBuilder()->getConnection(); /** @phpstan-ignore-line getConnection is deprecated */
+        $fieldExpr  = DatabasePlatform::applyTypeIfStrict(
+            $connection->getDatabasePlatform(),
+            $leadsTableAlias.'.'.$event->getFilter()->getField(),
+            'text'
+        );
+
         foreach ($event->getParameterHolder() as $parameter) {
-            $expressions[] = $queryBuilder->expr()->{$operator}($leadsTableAlias.'.'.$event->getFilter()->getField(), $parameter);
+            $expressions[] = $queryBuilder->expr()->$operator($fieldExpr, $parameter);
         }
 
         if ($applyIsNull) {
@@ -210,12 +244,35 @@ final class SegmentOperatorQuerySubscriber implements EventSubscriberInterface
 
         $operator = $event->operatorIsOneOf(OperatorOptions::INCLUDING_ALL) ? 'in' : $event->getFilter()->getOperator();
 
-        $event->addExpression(
-            $event->getQueryBuilder()->expr()->{$operator}(
-                $leadsTableAlias.'.'.$event->getFilter()->getField(),
-                $event->getParameterHolder()
-            )
-        );
+        $qb         = $event->getQueryBuilder();
+        $connection = $qb->getConnection(); /** @phpstan-ignore-line getConnection is deprecated */
+        $platform = $connection->getDatabasePlatform();
+        $column   = $leadsTableAlias.'.'.$event->getFilter()->getField();
+
+        if ('like' === $operator) {
+            $event->addExpression(
+                DatabasePlatform::getCaseInsensitiveComparison(
+                    $platform,
+                    $column,
+                    (string) $event->getParameterHolder(),
+                    'LIKE',
+                    DatabasePlatform::FLAG_ENSURE_CAST
+                )
+            );
+        } else {
+            if (in_array($operator, ['startsWith', 'endsWith', 'regexp', 'notRegexp'])) {
+                $fieldExpr = DatabasePlatform::applyTypeIfStrict($platform, $column, 'text');
+            } else {
+                $fieldExpr = $column;
+            }
+
+            $event->addExpression(
+                $event->getQueryBuilder()->expr()->{$operator}(
+                    $fieldExpr,
+                    $event->getParameterHolder()
+                )
+            );
+        }
 
         $event->stopPropagation();
     }

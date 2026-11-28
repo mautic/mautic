@@ -9,31 +9,33 @@ use Mautic\CoreBundle\Doctrine\PreUpAssertionMigration;
 
 final class Version20210420113309 extends PreUpAssertionMigration
 {
+    protected const TABLE_NAME = 'lead_lists';
+    protected const INDEX_NAME = 'lead_list_alias';
+
     protected function preUpAssertions(): void
     {
+        $tableName = $this->getPrefixedTableName(self::TABLE_NAME);
+
         $this->skipAssertion(
-            fn (Schema $schema) => $schema->getTable($this->getTableName())->hasIndex($this->getIndexName()),
-            "Index {$this->getIndexName()} already exists"
+            fn (Schema $schema) => $this->indexExists($tableName, self::INDEX_NAME),
+            sprintf('Index %s already exists', self::INDEX_NAME)
         );
     }
 
     public function up(Schema $schema): void
     {
-        $this->addSql("CREATE INDEX {$this->getIndexName()} ON {$this->getTableName()} (alias)");
+        $this->createIndex(
+            $this->getPrefixedTableName(self::TABLE_NAME),
+            self::INDEX_NAME,
+            ['alias']
+        );
     }
 
     public function down(Schema $schema): void
     {
-        $this->addSql("DROP INDEX {$this->getIndexName()} ON {$this->getTableName()}");
-    }
-
-    private function getTableName(): string
-    {
-        return "{$this->prefix}lead_lists";
-    }
-
-    private function getIndexName(): string
-    {
-        return "{$this->prefix}lead_list_alias";
+        $this->dropIndex(
+            $this->getPrefixedTableName(self::TABLE_NAME),
+            self::INDEX_NAME
+        );
     }
 }

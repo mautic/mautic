@@ -8,6 +8,7 @@ use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
 use Doctrine\ORM\QueryBuilder;
 use Mautic\AssetBundle\Entity\Asset;
 use Mautic\CampaignBundle\Entity\Campaign;
+use Mautic\CoreBundle\Doctrine\DatabasePlatform;
 use Mautic\CoreBundle\Entity\CommonRepository;
 use Mautic\EmailBundle\Entity\Email;
 use Mautic\PageBundle\Entity\Page;
@@ -119,19 +120,32 @@ final class ProjectRepository extends CommonRepository
         return 'p';
     }
 
-    public function checkProjectNameExists(string $name, ?int $ignoredId = null): bool
+    public function getProjectByName(string $name, ?int $ignoredId = null): ?Project
     {
+        $platform = $this->getEntityManager()->getConnection()->getDatabasePlatform();
+
+        $where = DatabasePlatform::getCaseInsensitiveComparison(
+            $platform,
+            $this->getTableAlias().'.name',
+            ':name',
+            'LIKE',
+            DatabasePlatform::FLAG_FORCE_LOWER_COLUMN | DatabasePlatform::FLAG_FORCE_LOWER_VALUE
+        );
+
         $q = $this->createQueryBuilder($this->getTableAlias());
-        $q->select('1');
-        $q->where($this->getTableAlias().'.name = :name');
+        $q->where($where);
         $q->setParameter('name', $name);
-        $q->setMaxResults(1);
 
         if (null !== $ignoredId) {
             $q->andWhere($q->expr()->neq($this->getTableAlias().'.id', ':ignoredId'));
             $q->setParameter('ignoredId', $ignoredId);
         }
 
-        return !empty($q->getQuery()->getResult());
+        return $q->getQuery()->getOneOrNullResult();
+    }
+
+    public function checkProjectNameExists(string $name, ?int $ignoredId = null): bool
+    {
+        return $this->getProjectByName($name, $ignoredId) instanceof Project;
     }
 }

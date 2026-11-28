@@ -57,6 +57,13 @@ final class DoctrineStep implements StepInterface
     public $password;
 
     /**
+     * Database charset.
+     *
+     * @var string
+     */
+    public $charset = 'utf8mb4';
+
+    /**
      * Backup tables if they exist; otherwise drop them.
      * Required in step.
      *
@@ -99,7 +106,7 @@ final class DoctrineStep implements StepInterface
         if (!class_exists('\PDO')) {
             $messages[] = 'mautic.install.pdo.mandatory';
         } else {
-            if (!in_array('mysql', \PDO::getAvailableDrivers(), true)) {
+            if ([] === self::getDrivers()) {
                 $messages[] = 'mautic.install.pdo.drivers';
             }
         }
@@ -117,6 +124,16 @@ final class DoctrineStep implements StepInterface
      */
     public function update(StepInterface $data): array
     {
+        // Resolve a missing or default-MySQL charset from the selected driver.
+        // Do not depend on the JavaScript onchange handler. Preserve an
+        // explicit non-default value.
+        if ($data instanceof self
+            && 'pdo_pgsql' === ($data->driver ?? null)
+            && (empty($data->charset) || 'utf8mb4' === $data->charset)
+        ) {
+            $data->charset = 'UTF8';
+        }
+
         $parameters = [];
 
         foreach ($data as $key => $value) {
@@ -149,6 +166,7 @@ final class DoctrineStep implements StepInterface
     {
         $mauticSupported = [
             'pdo_mysql' => 'MySQL PDO (Recommended)',
+            'pdo_pgsql' => 'PostgreSQL PDO (Experimental)',
         ];
 
         $supported = [];
