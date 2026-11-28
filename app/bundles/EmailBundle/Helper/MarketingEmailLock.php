@@ -37,7 +37,7 @@ class MarketingEmailLock
      */
     public function acquire(array $emailIds, int $contactId): ?array
     {
-        $emailIds = array_values(array_unique(array_map('intval', $emailIds)));
+        $emailIds = array_values(array_unique(array_map(intval(...), $emailIds)));
         sort($emailIds, SORT_NUMERIC);
 
         $locks = [];

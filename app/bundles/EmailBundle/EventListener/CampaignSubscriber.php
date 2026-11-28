@@ -334,6 +334,33 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
             $credentialArray[$logId] = $leadCredentials;
         }
 
+        $sendEmail = function () use (&$credentialArray, $email, $options, $event, $pending): void {
+            if (0 === count($credentialArray)) {
+                return;
+            }
+
+            $errors = $this->emailModel->sendEmail($email, $credentialArray, $options);
+
+            // Fail those that failed to send
+            foreach ($errors as $failedContactId => $reason) {
+                $log = $event->findLogByContactId($failedContactId);
+                unset($credentialArray[$log->getId()]);
+
+                if ($this->translator->trans('mautic.email.dnc') === $reason) {
+                    // Do not log DNC as errors because they'll be retried rather just let the UI know
+                    $event->passWithError($log, $reason);
+                    continue;
+                }
+
+                $event->fail($log, $reason);
+            }
+
+            // Pass everyone else
+            foreach (array_keys($credentialArray) as $logId) {
+                $event->pass($pending->get($logId));
+            }
+        };
+
         if (MailHelper::EMAIL_TYPE_MARKETING == $type) {
             $marketingEmailIds = [$emailId];
             foreach ($email->getVariantChildren() as $child) {
@@ -388,34 +415,17 @@ final readonly class CampaignSubscriber implements EventSubscriberInterface
                     unset($credentialArray[$log->getId()]);
                 }
 
-                if (count($credentialArray)) {
-                    $errors = $this->emailModel->sendEmail($email, $credentialArray, $options);
-
-                    // Fail those that failed to send
-                    foreach ($errors as $failedContactId => $reason) {
-                        $log = $event->findLogByContactId($failedContactId);
-                        unset($credentialArray[$log->getId()]);
-
-                        if ($this->translator->trans('mautic.email.dnc') === $reason) {
-                            // Do not log DNC as errors because they'll be retried rather just let the UI know
-                            $event->passWithError($log, $reason);
-                            continue;
-                        }
-
-                        $event->fail($log, $reason);
-                    }
-
-                    // Pass everyone else
-                    foreach (array_keys($credentialArray) as $logId) {
-                        $event->pass($pending->get($logId));
-                    }
-                }
+                $sendEmail();
             } finally {
                 foreach ($locks as $contactLocks) {
                     $this->marketingEmailLock->release($contactLocks);
                 }
             }
+
+            return;
         }
+
+        $sendEmail();
     }
 
     /**
