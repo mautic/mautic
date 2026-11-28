@@ -4,6 +4,7 @@ use Doctrine\DBAL\Types\Types;
 use Mautic\CoreBundle\Doctrine\Type;
 use Mautic\CoreBundle\EventListener\ConsoleErrorListener;
 use Mautic\CoreBundle\EventListener\ConsoleTerminateListener;
+use Mautic\CoreBundle\Release\ThisRelease;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -410,7 +411,7 @@ $container->loadFromExtension('fm_elfinder', [
 $container->loadFromExtension('api_platform', [
     'title'             => 'Mautic API',
     'description'       => 'API endpoints for Mautic',
-    'version'           => '1.0.0',
+    'version'           => ThisRelease::getMetadata()->getVersion(),
     'show_webby'        => false,
     'enable_swagger'    => true,
     'enable_swagger_ui' => true,

@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use FOS\OAuthServerBundle\Form\Handler\AuthorizeFormHandler;
+use Mautic\ApiBundle\OpenApi\OpenApiFactory;
+use Mautic\ApiBundle\Serializer\OpenApiYamlEncoder;
 use Mautic\CoreBundle\DependencyInjection\MauticCoreExtension;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
@@ -42,6 +44,19 @@ return function (ContainerConfigurator $configurator): void {
         ->tag('controller.service_arguments');
 
     $services->alias('mautic.api.model.client', Mautic\ApiBundle\Model\ClientModel::class);
+
+    $services->set(OpenApiFactory::class)
+        ->decorate('api_platform.openapi.factory')
+        ->args([
+            service('.inner'),
+            service(Mautic\CoreBundle\Helper\CoreParametersHelper::class),
+        ]);
+
+    $services->set(OpenApiYamlEncoder::class)
+        ->decorate('api_platform.yamlopenapi.encoder')
+        ->args([service('.inner')])
+        ->autoconfigure(false)
+        ->tag('serializer.encoder');
 
     // Register custom PUT processor to fix PUT operations globally
     // This ensures PUT requests update existing entities instead of creating new ones
